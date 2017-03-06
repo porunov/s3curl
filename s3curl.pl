@@ -27,14 +27,6 @@ use constant STAT_MODE => 2;
 use constant STAT_UID => 4;
 
 # begin customizing here
-my @endpoints = ( 's3.amazonaws.com',
-                  's3-us-west-1.amazonaws.com',
-                  's3-us-west-2.amazonaws.com',
-                  's3-us-gov-west-1.amazonaws.com',
-                  's3-eu-west-1.amazonaws.com',
-                  's3-ap-southeast-1.amazonaws.com',
-                  's3-ap-northeast-1.amazonaws.com',
-                  's3-sa-east-1.amazonaws.com', );
 
 my $CURL = "curl";
 
@@ -58,6 +50,7 @@ my $copySourceObject;
 my $copySourceRange;
 my $postBody;
 my $calculateContentMD5 = 0;
+my $doDnsStyle;
 
 my $DOTFILENAME=".s3curl";
 my $EXECFILE=$FindBin::Bin;
@@ -98,6 +91,7 @@ GetOptions(
     'help' => \$help,
     'debug' => \$debug,
     'calculateContentMd5' => \$calculateContentMD5,
+    'dnsStyle' => \$doDnsStyle,
 );
 
 my $usage = <<USAGE;
@@ -288,21 +282,13 @@ sub debug {
 
 sub getResourceToSign {
     my ($host, $resourceToSignRef) = @_;
-    for my $ep (@endpoints) {
-        if ($host =~ /(.*)\.$ep/) { # vanity subdomain case
-            my $vanityBucket = $1;
-            $$resourceToSignRef = "/$vanityBucket".$$resourceToSignRef;
-            debug("vanity endpoint signing case");
-            return;
-        }
-        elsif ($host eq $ep) {
-            debug("ordinary endpoint signing case");
-            return;
-        }
+    if (defined $doDnsStyle) {
+      my $vanityBucket = $1;
+      $$resourceToSignRef = "/$vanityBucket".$$resourceToSignRef;
+      debug("vanity endpoint signing case");
+      return;
     }
-    # cname case
-    $$resourceToSignRef = "/$host".$$resourceToSignRef;
-    debug("cname endpoint signing case");
+    debug("ordinary endpoint signing case");
 }
 
 
