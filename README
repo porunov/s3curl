@@ -101,7 +101,12 @@ To list all the versions in a bucket:
 ./s3curl.pl --id=[friendly-name] -- http://s3.amazonaws.com/[bucket-name]?versions
 
 To use bucket name in a domain name you need to use `--dnsStyle` parameter. Otherwise path style will be used (bucket name will be read from path):
+
 ./s3curl.pl --id=[friendly-name] -- http://[bucket-name].s3.amazonaws.com/
+
+Use --noSecurityWarn parameter if you don't want to be shown security warn
+
+s3curl.pl --id myAccessKey --key mySecretKey --noSecurityWarn http://myS3domain.com:8080/myBucket/myFile 1> /tmp/myFile
 
 SECURITY CONSIDERATION:
 
