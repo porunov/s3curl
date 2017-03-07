@@ -51,6 +51,7 @@ my $copySourceRange;
 my $postBody;
 my $calculateContentMD5 = 0;
 my $doDnsStyle;
+my $doNoSecurityWarn;
 
 my $DOTFILENAME=".s3curl";
 my $EXECFILE=$FindBin::Bin;
@@ -92,6 +93,7 @@ GetOptions(
     'debug' => \$debug,
     'calculateContentMd5' => \$calculateContentMD5,
     'dnsStyle' => \$doDnsStyle,
+    'noSecurityWarn' => \$doNoSecurityWarn,
 );
 
 my $usage = <<USAGE;
@@ -293,6 +295,9 @@ sub getResourceToSign {
 
 
 sub printCmdlineSecretWarning {
+    if(defined $doNoSecurityWarn){
+      return;
+    }
     print STDERR <<END_WARNING;
 WARNING: It isn't safe to put your AWS secret access key on the
 command line!  The recommended key management system is to store
